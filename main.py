@@ -1,6 +1,9 @@
 from dotenv import load_dotenv
 from modules.notifications import send_message
+from modules.planner import create_trip
 
 load_dotenv()
 
-send_message("🎉 Flight Deal Bot is working securely!")
+trip = create_trip()
+
+send_message(trip)

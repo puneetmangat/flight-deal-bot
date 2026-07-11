@@ -1,0 +1,2 @@
+DEPARTURE = "Delhi"
+DESTINATION = "Everywhere"
