@@ -1,1 +1,1 @@
-user_states = {}
+user_sessions = {}
