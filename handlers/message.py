@@ -1,43 +1,34 @@
 from telegram import Update
 from telegram.ext import ContextTypes
 
-from config.session import user_states
-from modules.states import ASK_LOCATION, ASK_GOAL, ASK_DESTINATION
+from modules.conversation_engine import (
+    save_answer,
+    next_question,
+    get_current_question,
+    is_complete,
+    get_answers,
+)
 
 
 async def message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
     text = update.message.text
 
-    state = user_states.get(user_id)
+    save_answer(user_id, text)
 
-    if state == ASK_LOCATION:
-        context.user_data["location"] = text
-        user_states[user_id] = ASK_GOAL
+    next_question(user_id)
 
-        await update.message.reply_text(
-            "🎯 What's your travel goal?"
-        )
+    if is_complete(user_id):
+        answers = get_answers(user_id)
 
-    elif state == ASK_GOAL:
-        context.user_data["goal"] = text
-        user_states[user_id] = ASK_DESTINATION
+        summary = "✅ Trip Summary\n\n"
 
-        await update.message.reply_text(
-            "🌍 Where do you want to go?"
-        )
+        for key, value in answers.items():
+            summary += f"{key.title()}: {value}\n"
 
-    elif state == ASK_DESTINATION:
-        context.user_data["destination"] = text
+        await update.message.reply_text(summary)
+        return
 
-        await update.message.reply_text(
-            f"✅ Trip Summary\n\n"
-            f"📍 From: {context.user_data['location']}\n"
-            f"🎯 Goal: {context.user_data['goal']}\n"
-            f"🌍 Destination: {context.user_data['destination']}"
-        )
+    question = get_current_question(user_id)
 
-    else:
-        await update.message.reply_text(
-            "Please type /start to begin."
-        )
+    await update.message.reply_text(question["text"])

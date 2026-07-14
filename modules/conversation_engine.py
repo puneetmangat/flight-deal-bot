@@ -42,3 +42,12 @@ def next_question(user_id):
 
             session["current_question"] = None
             return
+
+def is_complete(user_id):
+    session = user_sessions[user_id]
+    return session["current_question"] is None
+
+
+def get_answers(user_id):
+    return user_sessions[user_id]["answers"]
+

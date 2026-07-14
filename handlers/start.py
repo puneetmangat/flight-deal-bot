@@ -1,15 +1,18 @@
 from telegram import Update
 from telegram.ext import ContextTypes
 
-from config.session import user_states
-from modules.states import ASK_LOCATION
+from modules.conversation_engine import (
+    start_session,
+    get_current_question,
+)
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
 
-    user_states[user_id] = ASK_LOCATION
+    start_session(user_id)
 
-    await update.message.reply_text(
-        "📍 Welcome to Smart Travel Engine!\n\nWhere are you starting your journey?"
-    )
+    question = get_current_question(user_id)
+
+    await update.message.reply_text(question["text"])
+
