@@ -8,6 +8,7 @@ from modules.conversation_engine import (
     is_complete,
     get_answers,
 )
+from modules.profile import build_profile
 
 
 async def message(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -20,11 +21,17 @@ async def message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if is_complete(user_id):
         answers = get_answers(user_id)
+        profile = build_profile(answers)
+        trip = profile["trip"]
 
-        summary = "✅ Trip Summary\n\n"
-
-        for key, value in answers.items():
-            summary += f"{key.title()}: {value}\n"
+        summary = (
+            "✅ Smart Travel Engine\n\n"
+            f"📍 Departure: {trip['departure']}\n"
+            f"🌍 Destination: {trip['destination']}\n"
+            f"🎯 Goal: {trip['goal']}\n"
+            f"📅 Dates: {trip['dates']}\n"
+            f"💰 Budget: {trip['budget']}"
+        )
 
         await update.message.reply_text(summary)
         return
